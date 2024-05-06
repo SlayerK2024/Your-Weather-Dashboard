@@ -13,21 +13,21 @@ searchButton.addEventListener('click', function() {
   saveCityToLocalStorage(city);
 
   fetch(queryURL)
-    .then(response => {
-      if (!response.ok) {
-        throw new Error('Network response was not ok');
-      }
-      return response.json();
-    })
-    .then(data => {
-      document.getElementById('main-name').textContent = data.name;
-      document.getElementById('main-icon').innerHTML = `<img src="http://openweathermap.org/img/wn/${data.weather[0].icon}.png" alt="Weather Icon">`;
-      if (data.main && data.main.temp) {
-        document.getElementById('main-temp').textContent = `Temperature: ${(data.main.temp - 273.15).toFixed(2)}°C`;
-      }
-      document.getElementById('main-wind').textContent = `Wind: ${data.wind.speed} m/s`;
-      document.getElementById('main-humidity').textContent = `Humidity: ${data.main.humidity}%`;
-    })
+.then(response => {
+  if (!response.ok) {
+    throw new Error('Network response was not ok');
+  }
+  return response.json();
+})
+.then(data => {
+  document.getElementById('main-name').textContent = data.name;
+  // Note: The icon URL should be constructed using the icon code provided by the API
+  document.getElementById('main-icon').innerHTML = `<img src="http://openweathermap.org/img/wn/${data.weather[0].icon}.png" alt="Weather Icon">`;
+  // Temperature in Kelvin needs to be converted to Celsius
+  document.getElementById('main-temp').textContent = `Temperature: ${(data.main.temp - 273.15).toFixed(2)}°C`;
+  document.getElementById('main-wind').textContent = `Wind: ${data.wind.speed} m/s`;
+  document.getElementById('main-humidity').textContent = `Humidity: ${data.main.humidity}%`;
+})
     .catch(error => {
       console.error('Error fetching weather data:', error);
       // Display a user-friendly error message on the UI
