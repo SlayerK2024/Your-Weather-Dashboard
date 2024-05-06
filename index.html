@@ -26,16 +26,17 @@
           <form>
             <section class="search-area" id="search-area">
               <label class="fs-2 fw-bold" for="city-input">Search for a City:</label>
-              <input type="text" class="form-control form-control-lg my-2" id="city"  placeholder="Your City....." />
+              <input type="text" class="form-control form-control-lg my-2" id="city" placeholder="Your City....." aria-label="City" />
             </section>
           </form>
 
-          <button type="submit" class="btn-history btn form-control text-light mb-2 mt-2" id="searchButton">Get Your Forecast</button>
+      <button type="button" class="btn-history btn form-control text-light mb-2 mt-2" id="searchButton">Get Your Forecast</button>
 
           <div class="my-2">
             <div
               class="list-group border-top border-3 pt-2 rounded-0" id="search-history"></div>
           </div>
+          
         </div>
 
         <!--City Weather-->
@@ -51,9 +52,8 @@
           <!--5-Day Forecast-->
           <section class="mt-3" id="forecastWeather">
             <label class="fs-4 fw-bold" for="forcast-list"
-              >5-Day Forecast:</label
-            >
-            <div class="row" id="forecastDays"></div>
+              >5-Day Forecast:</label>
+            <div class="row" id="forecast-days"></div>
           </section>
         </div>
       </div>
