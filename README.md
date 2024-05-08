@@ -24,3 +24,6 @@ WHEN I click on a city in the search history
 
 THEN I am again presented with current and future conditions for that city
 Mock-Up
+
+![Screenshot_8-5-2024_19038_127 0 0 1](https://github.com/SlayerK2024/Your-Weather-Dashboard/assets/157855730/9bb926e4-e41f-4ff1-8c74-45c171f35857)
+Live Link:https://slayerk2024.github.io/Your-Weather-Dashboard/
