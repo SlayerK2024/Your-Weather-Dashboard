@@ -1,59 +1,80 @@
-const searchButton = document.getElementById('searchButton');
 const apiKey = "40829e2f98182b6a5326a4166a689b64";
+const searchButton = document.getElementById('searchButton');
+const cityInput = document.getElementById('city');
+const mainName = document.getElementById('main-name');
+const mainIcon = document.getElementById('main-icon');
+const mainTemp = document.getElementById('main-temp');
+const mainWind = document.getElementById('main-wind');
+const mainHumidity = document.getElementById('main-humidity');
+const searchedCitiesList = document.getElementById('searchedCitiesList');
+
 
 // Event listener for the search button click
-searchButton.addEventListener('click', async function() {
-  const city = document.getElementById('city').value.trim();
-  
-  if (city === '') {
-    alert('Please enter a city name.');
-    return;
-  }
+searchButton.addEventListener('click', function() {
+  const city = document.getElementById('city').value;
+  const queryURL = `http://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}`;
 
-  try {
-    // Save the city to local storage
-    saveCityToLocalStorage(city);
+  // Save the city to local storage
+  saveCityToLocalStorage(city);
 
-    // Fetch weather data
-    const weatherData = await fetchWeatherData(city);
-    
-    // Update UI with weather data
-    updateWeatherUI(weatherData);
-  } catch (error) {
-    console.error('Error fetching weather data:', error);
-    displayErrorMessage();
+  fetch(queryURL)
+.then(response => {
+  if (!response.ok) {
+    throw new Error('Network response was not ok');
   }
+  return response.json();
+})
+.then(data => {
+  mainName.textContent = data.name;
+  mainIcon.innerHTML = `<img src="http://openweathermap.org/img/wn/${data.weather[0].icon}.png" alt="Weather Icon">`;
+  mainTemp.textContent = `Temperature: ${(data.main.temp - 273.15).toFixed(2)}°C`;
+  mainWind.textContent = `Wind: ${data.wind.speed} m/s`;
+  mainHumidity.textContent = `Humidity: ${data.main.humidity}%`;
+})
+    .catch(error => {
+      console.error('Error fetching weather data:', error);
+      document.getElementById('main-name').textContent = 'Weather data unavailable';
+    });
 });
 
-// Function to fetch weather data
-async function fetchWeatherData(city) {
-  const url = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}`;
-  
-  const response = await fetch(url);
-  if (!response.ok) {
-    throw new Error('Weather data not available');
+// Function to fetch location coordinates
+async function getLocationCoordinates(city, state, country) {
+  const url = `http://api.openweathermap.org/geo/1.0/direct?q=${city},${state},${country}&limit=1&appid=${apiKey}`;
+
+  try {
+      const response = await fetch(url);
+      const data = await response.json();
+      return { lat: data[0].lat, lon: data[0].lon };
+  } catch (error) {
+      console.error('Error fetching location coordinates:', error);
   }
-  
-  const data = await response.json();
-  return data;
 }
 
-// Function to update the UI with weather data
-function updateWeatherUI(data) {
-  document.getElementById('main-name').textContent = data.name;
-  document.getElementById('main-icon').innerHTML = `<img src="https://openweathermap.org/img/wn/${data.weather[0].icon}.png" alt="Weather Icon">`;
-  document.getElementById('main-temp').textContent = `Temperature: ${(data.main.temp - 273.15).toFixed(2)}°C`;
-  document.getElementById('main-wind').textContent = `Wind: ${data.wind.speed} m/s`;
-  document.getElementById('main-humidity').textContent = `Humidity: ${data.main.humidity}%`;
+// Function to fetch 5-day forecast
+async function getFiveDayForecast(lat, lon) {
+  const url = `https://api.openweathermap.org/data/2.5/onecall?lat=${lat}&lon=${lon}&exclude=current,minutely,hourly&appid=${apiKey}`;
+
+  try {
+      const response = await fetch(url);
+      const data = await response.json();
+      return data.daily; 
+  } catch (error) {
+      console.error('Error fetching 5-day forecast:', error);
+  }
 }
 
-// Function to display an error message on the UI
-function displayErrorMessage() {
-  document.getElementById('main-name').textContent = 'Weather data unavailable';
-  // Optionally, you can clear other weather-related elements or display additional error information.
-}
+// Example usage
+async function displayFiveDayForecast(city, state, country) {
+  const { lat, lon } = await getLocationCoordinates(city, state, country);
+  const forecastData = await getFiveDayForecast(lat, lon);
 
-// Function to save the city to local storage
+  // Display forecast data on your webpage
+  console.log('5-day forecast:', forecastData);
+}
+displayFiveDayForecast('London', '', 'GB');
+
+
+// Save the city to local storage
 function saveCityToLocalStorage(city) {
   let cities = JSON.parse(localStorage.getItem('searchedCities')) || [];
   if (!cities.includes(city)) {
@@ -62,19 +83,23 @@ function saveCityToLocalStorage(city) {
   }
 }
 
+// Array to store searched cities
+let searchedCities = JSON.parse(localStorage.getItem('searchedCities')) || [];
+
 // Function to display the list of searched cities on the webpage
 function displaySearchedCities() {
-  let cities = JSON.parse(localStorage.getItem('searchedCities')) || [];
-  const searchedCitiesList = document.getElementById('searchedCitiesList');
   searchedCitiesList.innerHTML = ''; // Clear previous list
 
-  cities.forEach(city => {
+  searchedCities.forEach(city => {
     const listItem = document.createElement('li');
     listItem.textContent = city;
     searchedCitiesList.appendChild(listItem);
   });
 }
+// Call addSearchedCity when a user searches for a city
+addSearchedCity('London');
+addSearchedCity('Paris');
+addSearchedCity('New York');
 
-// Initial display of searched cities
+// Call displaySearchedCities to display the list on your webpage
 displaySearchedCities();
-
